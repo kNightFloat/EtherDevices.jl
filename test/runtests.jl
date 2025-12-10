@@ -12,16 +12,17 @@ using Test
 using EtherDevices
 using KernelAbstractions
 
-const kBackend = CPU()
-
 @testset "deviceman transfer" begin
-    dm = EtherDevices.DeviceMan{Int32, Float32, 1}()
-    @test dm(42) isa Int32
-    @test dm(3.14) isa Float32
-    @test dm.([1, 2, 3]) == Int32[1, 2, 3]
-    @test dm.([1.0, 2.0, 3.0]) == Float32[1.0, 2.0, 3.0]
-    @test EtherDevices.switch!(dm, kBackend) === nothing
-    EtherDevices.switch!(dm, kBackend)
-    @test EtherDevices.zeroi(dm, kBackend, 2, 2) == zeros(Int32, 2, 2)
-    @test EtherDevices.zerof(dm, kBackend, 2, 2) == zeros(Float32, 2, 2)
+    ed1 = EtherDevice{Int32, Float32, CPU, 1}()
+    ed2 = EtherDevice{Int64, Float16, CPU, 1}()
+    @test ed1(1) isa Int32
+    @test ed1(3.14) isa Float32
+    @test ed2(Int128(1)) isa Int64
+    @test ed2(3.14) isa Float16
+    switch!(ed1)
+    switch!(ed2)
+    ai1 = zerosi(ed1, 3, 4)
+    af2 = zerosf(ed2, 3, 4)
+    @test ed2(ai1) ≈ Int64.(zeros(3, 4))
+    @test ed1(af2) ≈ Float32.(zeros(3, 4))
 end
