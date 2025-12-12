@@ -14,8 +14,16 @@ export backend, id
 export switch!
 export zerosi, zerosf
 export AbstractEtherDevice, EtherDevice
+export @device_sync
 
 using KernelAbstractions
+
+macro device_sync(b, expr)
+    return esc(:(
+        $expr;
+        KernelAbstractions.synchronize($b)
+    ))
+end
 
 # * ===== ===== ===== ===== AbstractEtherDevice ===== ===== ===== ===== * #
 
@@ -43,6 +51,18 @@ end
     ::AbstractEtherDevice{Ti, Tf, Tb, Id},
 )::Int where {Ti <: Integer, Tf <: AbstractFloat, Tb <: KernelAbstractions.Backend, Id}
     return Id
+end
+
+@inline function KernelAbstractions.synchronize(
+    ::AbstractEtherDevice{<:Integer, <:AbstractFloat, Tb, Id},
+) where {Tb <: KernelAbstractions.Backend, Id}
+    return KernelAbstractions.synchronize(Tb())
+end
+
+@inline function KernelAbstractions.get_backend(
+    ::AbstractEtherDevice{<:Integer, <:AbstractFloat, Tb, Id},
+)::Tb where {Tb <: KernelAbstractions.Backend, Id}
+    return Tb()
 end
 
 @inline function switch!(

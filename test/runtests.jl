@@ -25,4 +25,5 @@ using KernelAbstractions
     af2 = zerosf(ed2, 3, 4)
     @test ed2(ai1) ≈ Int64.(zeros(3, 4))
     @test ed1(af2) ≈ Float32.(zeros(3, 4))
+    @test get_backend(ed1) == CPU()
 end
