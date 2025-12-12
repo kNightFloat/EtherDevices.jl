@@ -13,8 +13,8 @@ using EtherDevices
 using KernelAbstractions
 
 @testset "deviceman transfer" begin
-    ed1 = EtherDevice{Int32, Float32, CPU, 1}()
-    ed2 = EtherDevice{Int64, Float16, CPU, 1}()
+    ed1 = EDevice{Int32, Float32, CPU, 1}()
+    ed2 = EDevice{Int64, Float16, CPU, 1}()
     @test ed1(1) isa Int32
     @test ed1(3.14) isa Float32
     @test ed2(Int128(1)) isa Int64

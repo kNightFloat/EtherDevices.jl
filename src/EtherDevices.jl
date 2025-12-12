@@ -13,16 +13,15 @@ export int, float
 export backend, id
 export switch!
 export zerosi, zerosf
-export AbstractEtherDevice, EtherDevice
+export AbstractEtherDevice
+export EDevice
 export @device_sync
 
 using KernelAbstractions
 
 macro device_sync(b, expr)
-    return esc(:(
-        $expr;
-        KernelAbstractions.synchronize($b)
-    ))
+    return esc(:($expr;
+    KernelAbstractions.synchronize($b)))
 end
 
 # * ===== ===== ===== ===== AbstractEtherDevice ===== ===== ===== ===== * #
@@ -129,24 +128,26 @@ end
     end
 end
 
-# * ===== ===== ===== ===== EtherDevice ===== ===== ===== ===== * #
+# * ===== ===== EtherDevice ===== ===== * #
 
-struct EtherDevice{Ti <: Integer, Tf <: AbstractFloat, Tb <: KernelAbstractions.Backend, Id} <:
+struct EDevice{Ti <: Integer, Tf <: AbstractFloat, Tb <: KernelAbstractions.Backend, Id} <:
        AbstractEtherDevice{Ti, Tf, Tb, Id} end
 
-@inline function EtherDevice{
+@inline function EDevice{
     Ti,
     Tf,
     Tb,
-}()::EtherDevice{Ti, Tf, Tb, 1} where {Ti <: Integer, Tf <: AbstractFloat, Tb <: KernelAbstractions.Backend}
-    return EtherDevice{Ti, Tf, Tb, 1}()
+}()::EDevice{Ti, Tf, Tb, 1} where {Ti <: Integer, Tf <: AbstractFloat, Tb <: KernelAbstractions.Backend}
+    return EDevice{Ti, Tf, Tb, 1}()
 end
 
-@inline function EtherDevice{
+@inline function EDevice{Ti, Tf}()::EDevice{
     Ti,
     Tf,
-}()::EtherDevice{Ti, Tf, KernelAbstractions.CPU, 1} where {Ti <: Integer, Tf <: AbstractFloat}
-    return EtherDevice{Ti, Tf, KernelAbstractions.CPU, 1}()
+    KernelAbstractions.CPU,
+    1,
+} where {Ti <: Integer, Tf <: AbstractFloat}
+    return EDevice{Ti, Tf, KernelAbstractions.CPU, 1}()
 end
 
 end # module EtherDevices
